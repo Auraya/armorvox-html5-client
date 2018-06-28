@@ -1,4 +1,3 @@
-const SERVER = "https://cloud.armorvox.com/vixverify/v6/";
 
 var condition;
 var extra;
@@ -11,6 +10,7 @@ function apiSetDataEnrol(group, id, printName, utterances) {
   dataObj.data.append('group', group);
   dataObj.data.append('id', id);
   dataObj.data.append('print_name', printName);
+  dataObj.data.append('override', "enrol.qa.ubm_fr_prob=0.01");
   for (var i = 0; i < utterances.length; i++) {
     dataObj.data.append('utterance' + (i + 1), utterances[i]);
   }
@@ -24,6 +24,7 @@ function apiSetDataVerify(group, id, printName, utterance, phrase, vocab) {
   dataObj.data.append('group', group);
   dataObj.data.append('id', id);
   dataObj.data.append('print_name', printName);
+  dataObj.data.append('override', "verify.qa.ubm_fr_prob=0.01");
   dataObj.data.append('utterance', utterance);
   if (phrase && vocab) {
     dataObj.data.append('phrase', phrase);
@@ -59,6 +60,7 @@ function apiSetDataCheckQuality(group, printName, utterance, mode) {
   dataObj.data = new FormData();
   dataObj.data.append('group', group);
   dataObj.data.append('print_name', printName);
+  dataObj.data.append('override', mode+".qa.ubm_fr_prob=0.01");
   dataObj.data.append('utterance', utterance);
   dataObj.data.append('mode', mode);
   dataList.push(dataObj);

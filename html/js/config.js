@@ -26,6 +26,7 @@ const STEP_RETRY = "retry";
 const STEP_API_ERROR = "api_error";
 
 // api
+const SERVER = "https://cloud.armorvox.com/eval_server/vxml/v6/";
 const GROUP = "your_group_name";
 const VOCAB = "en_us_v_2.0";
 const QA_MODE = API_ENROL;
