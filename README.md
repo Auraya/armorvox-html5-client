@@ -7,9 +7,8 @@ Installation Steps
 * Edit html/js/config.js
 * Change the GROUP to the one listed in your licence
 * If necessary change the SERVER 
-* Point your browser at the page
+* Point your browser at the page http://localhost/html/index.html
 * Use Chrome, Edge, Firefox or Safari (macOS or iPhone)
-* http://localhost/html/index.html
 
 Enrolment Steps
 * Click enrol
