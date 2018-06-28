@@ -26,7 +26,7 @@ const STEP_RETRY = "retry";
 const STEP_API_ERROR = "api_error";
 
 // api
-const GROUP = "vix_verify";
+const GROUP = "your_group_name";
 const VOCAB = "en_us_v_2.0";
 const QA_MODE = API_ENROL;
 const PN_MOBILE = "digit-mobile";
