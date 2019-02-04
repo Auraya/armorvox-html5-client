@@ -38,10 +38,21 @@ function widgetSetup(id, av, prompts, isEnrol=false, prints={name:'digit', fa_ra
 		listening.then((stream) => {
 			console.log('Got stream:', stream);
 
+			// For Desktops
+			record_button.addEventListener('mousedown', startRecording);
+			mic_widget.addEventListener('mouseup', stopRecording);
+			mic_widget.addEventListener('mouseleave', stopRecording);
+
+			// For iPhone
+			record_button.addEventListener('touchstart', startRecording);
+			mic_widget.addEventListener('touchend', stopRecording);
+
+			// For Mobile Android
 			record_button.addEventListener('pointerdown', startRecording);
 			mic_widget.addEventListener('pointerup', stopRecording);
 			mic_widget.addEventListener('pointerleave', stopRecording);
-			
+
+			// For Keyboard trigger
 			mic_widget.tabIndex = 0;
 			mic_widget.addEventListener('keypress', startRecording);
 			mic_widget.addEventListener('keyup', stopRecording);
@@ -117,7 +128,7 @@ function widgetSetup(id, av, prompts, isEnrol=false, prints={name:'digit', fa_ra
 					// The following enrols multiple prints. 
 					// Each print in the prints array is enrolled
 					var fn = (print) => {
-						return av.enrol(id, print.name, wavs_array)
+						return av.enrol(id.slice(-7), print.name, wavs_array)
 					}
 					
 					var actions = prints.map(fn);
@@ -161,7 +172,7 @@ function widgetSetup(id, av, prompts, isEnrol=false, prints={name:'digit', fa_ra
 		var print = prints[currentStep % prints.length];
 		var phrase = getSpaced(prompts[currentStep]);
 		
-		av.verify(id, print.name, wav.blob, phrase, print.al_rate).then((result) => {
+		av.verify(id.slice(-7), print.name, wav.blob, phrase, print.al_rate).then((result) => {
 			console.log(result);
 			record_box.classList.remove('hidden');
 			

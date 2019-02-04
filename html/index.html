@@ -1,6 +1,6 @@
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=0.86, maximum-scale=3.0, minimum-scale=0.86">
 <meta name="format-detection" content="telephone=no">
 <link rel="stylesheet" href="widget.css" type="text/css"/>
 <script src='armorvox.js'></script>
@@ -21,21 +21,22 @@ function onNext() {
 
 	document.querySelectorAll('.no-show').forEach((el) => {el.classList.remove('show');});
 
-	if (password.value == 'delete') {
-		doDelete();
-		password.value = '';
-		return;
-	}
+	var text = mobile.value.replace(/[^0-9]/g,'');
+        var id = text.slice(-7); // use last 7 digits of mobile number - since initial digits can change depending on area codes
 
-	var id = mobile.value.replace(/[^0-9]/g,'');
 	if (id == '') {
 		bad_id_message.classList.add('show');
 	} else {
+		if (password.value == 'delete') {
+			doDelete(id);
+			password.value = '';
+			return;
+		}
 		av.check_enrolled(id, 'digit',)
 		.then((result) => {
 			switch (result.condition) {
-				case 'ENROLLED': the_form.action = 'verify.html?id='+id+'&is_english='+is_english.checked+'&group='+group; the_form.submit(); break;
-				case 'NOT_ENROLLED': doEnrol(); break;
+				case 'ENROLLED': the_form.action = 'verify.html?id='+id+'&text='+text+'&is_english='+is_english.checked+'&group='+group; the_form.submit(); break;
+				case 'NOT_ENROLLED': doEnrol(id, text); break;
 				case 'ERROR': error_message.classList.add('show'); break;
 			}
 		})
@@ -46,49 +47,39 @@ function onNext() {
 	
 }
 
-function doEnrol() {
+function doEnrol(id, text) {
 
 	document.querySelectorAll('.no-show').forEach((el) => {el.classList.remove('show');});
 	
-	var id = mobile.value;
-	if (id == '') {
-		noid_message.classList.add('show');
-	} else {
-		av.check_enrolled(id, 'digit',)
-		.then((result) => {
-			switch (result.condition) {
-				case 'ENROLLED': already_enrolled_message.classList.add('show'); break;
-				case 'NOT_ENROLLED': the_form.action = 'enrol.html?id='+id+'&is_english='+is_english.checked+'&group='+group; the_form.submit(); break;
-				case 'ERROR': error_message.classList.add('show'); break;
-			}
-		})
-		.catch((e) => {
-			error_message.classList.add('show');
-		});
-	}
+	av.check_enrolled(id, 'digit',)
+	.then((result) => {
+		switch (result.condition) {
+			case 'ENROLLED': already_enrolled_message.classList.add('show'); break;
+			case 'NOT_ENROLLED': the_form.action = 'enrol.html?id='+id+'&text='+text+'&is_english='+is_english.checked+'&group='+group; the_form.submit(); break;
+			case 'ERROR': error_message.classList.add('show'); break;
+		}
+	})
+	.catch((e) => {
+		error_message.classList.add('show');
+	});
 }
 
 
-function doDelete() {
+function doDelete(id) {
 
 	document.querySelectorAll('.no-show').forEach((el) => {el.classList.remove('show');});
 	
-	var id = mobile.value;
-	if (id == '') {
-		noid_message.classList.add('show');
-	} else {
-		av.delete(id, 'digit')
-		.then((result) => {
-			switch (result.condition) {
-				case 'GOOD': deleted_message.classList.add('show'); break;
-				case 'NOT_ENROLLED': not_enrolled_message.classList.add('show'); break;
-				case 'ERROR': error_message.classList.add('show'); break;
-			}
-		})
-		.catch((e) => {
-			error_message.classList.add('show');
-		});
-	}
+	av.delete(id, 'digit')
+	.then((result) => {
+		switch (result.condition) {
+			case 'GOOD': deleted_message.classList.add('show'); break;
+			case 'NOT_ENROLLED': not_enrolled_message.classList.add('show'); break;
+			case 'ERROR': error_message.classList.add('show'); break;
+		}
+	})
+	.catch((e) => {
+		error_message.classList.add('show');
+	});
 }
 
 window.onload=(e) => {
@@ -107,8 +98,8 @@ window.onload=(e) => {
 	
 	<div id='identity_box'>
 		<form id="the_form" method='post'>
-			<input class='signin input' id='mobile' type='text' size='100' placeholder="Mobile number"/>
-			<input class='signin input' id='password' type='password' size='100'  placeholder="Password is ignored for demo"/>
+			<input class='signin input' id='mobile' type='tel' size='100' name='mobile-phone' autocomplete='tel-national' x-autocomplete='tel-national' placeholder="Mobile number"/>
+			<input class='signin input' id='password' type='password' size='100' autocomplete="new-password"  placeholder="Password is ignored for demo"/>
 			
 			
 	<div id="message_box">

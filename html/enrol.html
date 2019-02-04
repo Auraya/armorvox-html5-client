@@ -1,6 +1,6 @@
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=0.86, maximum-scale=3.0, minimum-scale=0.86">
 <meta name="format-detection" content="telephone=no">
 <link rel="stylesheet" href="widget.css" type="text/css"/>
 <script src='microphone.js'></script>
@@ -9,10 +9,11 @@
 <script>
      
 	var id = getRequestParameter('id');
+	var text = getRequestParameter('text');
 	var is_english_param = 'false' != getRequestParameter('is_english');
 	var group = getRequestParameter('group');
 	
-	var promptArray = [id, '123456789', '987654321', '618293574'];
+	var promptArray = [text, '123456789', '987654321', '618293574'];
 	promptArray = promptArray.map((p) => { return {text:p, is_english: is_english_param}; });
 	var av = new Armorvox('https://cloud.armorvox.com/evaluation/v6', group);
 	

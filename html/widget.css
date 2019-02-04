@@ -18,7 +18,7 @@ body {
     border-radius: 3px;
 	
 	draggable: false;
-/*	outline: 0; */
+	outline: 0; 
 	
 	-webkit-touch-callout: none; /* iOS Safari */
 	-webkit-user-select: none; /* Safari */
@@ -26,10 +26,6 @@ body {
 	-moz-user-select: none; /* Firefox */
 	-ms-user-select: none; /* Internet Explorer/Edge */
 	user-select: none; /* Non-prefixed version, supported by Chrome and Opera */
-}
-
-#mic_widget:focus {
-/*	outline:0; */
 }
 
 #identity_box {
@@ -100,7 +96,7 @@ body {
     border-radius: 4px;
 	
 	background-color: #ccc;
-	border: 1px groove #999;
+	border: 1px solid #000;
 }
 
 
@@ -133,7 +129,7 @@ body {
     border-radius: 4px;
 	
 	background-color: #ccc;
-	border: 1px groove #999;
+	border: 1px solid #000;
 }
 
 .button:hover {
@@ -181,7 +177,7 @@ body {
 
 .input {
 	
-	border: 1px groove #999;
+	border: 1px solid #000;
 	padding: 10px;
 }
 
