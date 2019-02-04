@@ -1,0 +1,75 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="format-detection" content="telephone=no">
+<link rel="stylesheet" href="widget.css" type="text/css"/>
+<script src='microphone.js'></script>
+<script src='armorvox.js'></script>
+<script src='widget.js'></script>
+<script>
+     
+	var id = getRequestParameter('id');
+	var is_english_param = 'false' != getRequestParameter('is_english');
+	var group = getRequestParameter('group');
+	
+	var promptArray = [id, '123456789', '987654321', '618293574'];
+	promptArray = promptArray.map((p) => { return {text:p, is_english: is_english_param}; });
+	var av = new Armorvox('https://cloud.armorvox.com/evaluation/v6', group);
+	
+	window.onload = () => {
+	
+		var digit = {name:'digit'};
+		var tpd = {name:'tpd'};
+	
+		av.delete(id, 'digit');
+		av.delete(id, 'tpd');
+		
+		widgetSetup(id, av, promptArray, true, [digit,tpd]);
+		
+		// Hide the widget for a moment will it draws, because it fickers
+		setTimeout(() => {mic_widget.classList.remove('hidden');}, 200);
+	}
+</script>
+</head>
+<body style='background-color:#fff'>
+
+<div id='mic_widget' class='hidden'>
+
+	<div id="title_box">VOICE ENROLMENT</div>
+
+	<div id="progress_box">
+		<canvas id="canvas_progress" width=200 height=30></canvas>
+	</div>
+	
+	
+	<div id='record_box'>
+		<button id='finish_button' class='button no-show' onclick="location.href='index.html?is_english='+is_english_param+'&group='+group">Finish</button>
+		<button id='record_button'><canvas class='canvas' id="canvas_tag"></canvas></button>
+		
+		<div id='select_box'>
+			<select id='select_tag'>
+				<option>No Microphone</option>
+			</select>
+		</div>
+		
+	</div>
+	
+	<div id="instruction_box">
+		<div id="message_box">
+			<span id="error_message" class="no-show">There was an error</span>
+			<span id="complete_message" class="no-show">Your enrolment was successful</span>
+			<span id="too_short" class="no-show">The audio was too short.<br/>You may need to speak more slowly.</span>
+			<span id="too_quiet" class="no-show">The audio was too quiet.<br/>Check your mic settings.</span>
+			<span id="bad_phrase" class="no-show">The phrase didn't sound right.</span>
+			<span id="dont_click" class="no-show">Do not click.</span>
+			<span id="read_prompt" class="no-show">Hold down the mic icon while you say</span>
+		</div>
+		
+		<div id="prompt_box">
+			<span id='prompt_text'>&nbsp;</span>
+		</div>
+	</div>
+	
+<div>
+</body>
+</html>

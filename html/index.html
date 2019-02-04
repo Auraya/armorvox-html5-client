@@ -1,34 +1,138 @@
-<!DOCTYPE html>
 <html>
 <head>
-  <title>ArmorVox Demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="css/style.css" type="text/css" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="js/control/audio.js"></script>
-  <script src="js/control/api.js"></script>
-  <script src="js/control/proxy.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/util.js"></script>
-  <script src="js/effect.js"></script>
-  <script src="js/main.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="format-detection" content="telephone=no">
+<link rel="stylesheet" href="widget.css" type="text/css"/>
+<script src='armorvox.js'></script>
+<script src='widget.js'></script>
+<script>
+
+// This page should be called with the correct group name as a request parameter
+// e.g. https://localhost/demo/index.html?group=my_company
+//
+// A valid group name can be requested from Auraya Systems.
+
+var group = getRequestParameter('group');
+var is_english_param = 'false' != getRequestParameter('is_english');
+
+var av = new Armorvox('https://cloud.armorvox.com/evaluation/v6', group);
+		
+function onNext() {
+
+	document.querySelectorAll('.no-show').forEach((el) => {el.classList.remove('show');});
+
+	if (password.value == 'delete') {
+		doDelete();
+		password.value = '';
+		return;
+	}
+
+	var id = mobile.value.replace(/[^0-9]/g,'');
+	if (id == '') {
+		bad_id_message.classList.add('show');
+	} else {
+		av.check_enrolled(id, 'digit',)
+		.then((result) => {
+			switch (result.condition) {
+				case 'ENROLLED': the_form.action = 'verify.html?id='+id+'&is_english='+is_english.checked+'&group='+group; the_form.submit(); break;
+				case 'NOT_ENROLLED': doEnrol(); break;
+				case 'ERROR': error_message.classList.add('show'); break;
+			}
+		})
+		.catch((e) => {
+			error_message.classList.add('show');
+		});
+	}
+	
+}
+
+function doEnrol() {
+
+	document.querySelectorAll('.no-show').forEach((el) => {el.classList.remove('show');});
+	
+	var id = mobile.value;
+	if (id == '') {
+		noid_message.classList.add('show');
+	} else {
+		av.check_enrolled(id, 'digit',)
+		.then((result) => {
+			switch (result.condition) {
+				case 'ENROLLED': already_enrolled_message.classList.add('show'); break;
+				case 'NOT_ENROLLED': the_form.action = 'enrol.html?id='+id+'&is_english='+is_english.checked+'&group='+group; the_form.submit(); break;
+				case 'ERROR': error_message.classList.add('show'); break;
+			}
+		})
+		.catch((e) => {
+			error_message.classList.add('show');
+		});
+	}
+}
+
+
+function doDelete() {
+
+	document.querySelectorAll('.no-show').forEach((el) => {el.classList.remove('show');});
+	
+	var id = mobile.value;
+	if (id == '') {
+		noid_message.classList.add('show');
+	} else {
+		av.delete(id, 'digit')
+		.then((result) => {
+			switch (result.condition) {
+				case 'GOOD': deleted_message.classList.add('show'); break;
+				case 'NOT_ENROLLED': not_enrolled_message.classList.add('show'); break;
+				case 'ERROR': error_message.classList.add('show'); break;
+			}
+		})
+		.catch((e) => {
+			error_message.classList.add('show');
+		});
+	}
+}
+
+window.onload=(e) => {
+	is_english.checked = is_english_param;
+};
+	
+</script>
 </head>
 <body>
-  <div id="div_outer">
-    <div id="div_main">
-      <div id="div_logo">
-        <img id="img_logo" src="images/logo.png" alt="ArmorVox"/>
-      </div>
-      <div id="div_content">
-        <div id="div_title" class="content-row"></div>
-        <div id="div_message" class="content-row"></div>
-        <div id="div_input" class="content-row"></div>
-        <div id="div_phrase" class="content-row"></div>
-        <div id="div_button" class="content-row"></div>
-        <div id="div_loader" class="content-row"></div>
-        <div id="div_progress" class="content-row"></div>
-      </div>
-    </div>
-  </div>
+
+<div id='mic_widget'>
+
+	<div id="title_box">SIGN IN</div>
+
+
+	
+	<div id='identity_box'>
+		<form id="the_form" method='post'>
+			<input class='signin input' id='mobile' type='text' size='100' placeholder="Mobile number"/>
+			<input class='signin input' id='password' type='password' size='100'  placeholder="Password is ignored for demo"/>
+			
+			
+	<div id="message_box">
+		<span id="error_message" class="pad alert no-show">There was a server error.</br>Details in browser console logs.</span>
+		<span id="bad_id_message" class="pad alert no-show">Please enter your mobile phone number</span>
+		<span id="already_enrolled_message" class="pad alert no-show">You must delete your ID before enrolling again.</span>
+		<span id="not_enrolled_message" class="pad alert no-show">Your ID is not enrolled.</span>
+		<span id="deleted_message" class="pad alert no-show">Your ID was deleted.</span>
+	</div>
+			
+			<input class='signin button ' id='verify_button' type='button' onclick="onNext()" value='Next'/>
+			<!--
+			<input class='signin button ' id='enrol_button' type='button' onclick="doEnrol()" value='Enrol'/>
+			<input class='signin button ' id='delete_button' type='button' onclick="doDelete()" value='Delete'/>
+			-->
+			<div >
+			<input class='signin input' id='is_english' type='checkbox' checked='true'/>
+			<label for="is_english">English</label>
+			</div>
+		</form>
+	</div>
+	
+
+	
+<div>
 </body>
 </html>
