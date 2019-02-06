@@ -1,4 +1,4 @@
-# Armorvox HTML5 Client
+# Armorvox HTML5 Exemplar
 
 This exemplar code shows how an HTML5 client connects to an ArmorVox server using API v6 (POST requests, VXML responses).
 It is intended to show how audio can be collected from the browser for enrolment and verification. It also shows the elementary ArmorVox API calls required to enrol and verify.
