@@ -104,10 +104,6 @@ body {
   background-color: #ddd;
 }
 
-#record_button:active {
-  background-color: #eea;
-  background-image: none;
-}
 
 #record_button.active {
   background-color: #eea;

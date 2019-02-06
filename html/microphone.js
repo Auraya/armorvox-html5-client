@@ -386,40 +386,74 @@ Microphone.prototype.makeWav = function () {
 */
 Microphone.prototype.makeRIFF = function (data) {
 	
-  var dataLength = data.length * 2;
-  var subChunkSize = 16;
-  var audioFormat = 1;
-  var byteRate = 16000;
-  var blockAlign = 2;
-  var bitsPerSample = 16;
-  if (this.isConvertToUlaw) {
-	data = this.convertToUlaw(data);
-	dataLength = data.length;
-	subChunkSize = 18;
-	audioFormat = 7;
-	byteRate = 8000;
-	blockAlign = 1;
-	bitsPerSample = 8;
-  }  
+	var reducer = (a,c) => a + c.byteLength; // Lambda for calculating chunk size
 	
-  var riff = new Int8Array([0x52, 0x49, 0x46, 0x46]); // RIFF
-  var chunkSize = new Uint32Array([36 + dataLength]);
-  var format = new Int8Array([0x57, 0x41, 0x56, 0x45,0x66, 0x6d, 0x74, 0x20]); // WAVEfmt
-  var subChunk1Size = new Uint32Array([subChunkSize]);
-  var audioFormat = new Uint16Array([audioFormat]);
-  var numChannels = new Uint16Array([1]);
-  var sampleRate = new Uint32Array([8000]);
-  var byteRate = new Uint32Array([byteRate]);
-  var blockAlign = new Uint16Array([blockAlign]);
-  var bitsPerSample = new Uint16Array([bitsPerSample]);
-  var zero = new Uint16Array([0]);
-  var subChunk2Id = new Int8Array([0x64, 0x61, 0x74, 0x61]); // data
-  var subChunk2Size = new Uint32Array([dataLength]); // length
+	// RIFF Header 
+	var riff = new Int8Array([0x52, 0x49, 0x46, 0x46]); // RIFF
+	var format = new Int8Array([0x57, 0x41, 0x56, 0x45]); // WAVE
+	
+	// Default format is PCM 8KHz, 16bit
+	var audioFormat = 1;
+	var byteRate = 16000;
+	var blockAlign = 2;
+	var bitsPerSample = 16;
 
-  return [].concat(riff).concat(chunkSize).concat(format).concat(subChunk1Size).concat(audioFormat).concat(
-    numChannels).concat(sampleRate).concat(byteRate).concat(
-    blockAlign).concat(bitsPerSample).concat(zero).concat(subChunk2Id).concat(
-    subChunk2Size).concat(data);
+	// Convert to ulaw?
+	if (this.isConvertToUlaw) {
+		data = this.convertToUlaw(data);
+		audioFormat = 7;
+		byteRate = 8000;
+		blockAlign = 1;
+		bitsPerSample = 8;
+	}  
+	
+	
+	// Chunk1 specifies encoding details
+	var audioFormat = new Uint16Array([audioFormat]);
+	var numChannels = new Uint16Array([1]);
+	var sampleRate = new Uint32Array([8000]);
+	var byteRate = new Uint32Array([byteRate]);
+	var blockAlign = new Uint16Array([blockAlign]);
+	var bitsPerSample = new Uint16Array([bitsPerSample]);
+  	
+	var subChunk1 = []
+		.concat(audioFormat)
+		.concat(numChannels)
+		.concat(sampleRate)
+		.concat(byteRate)
+		.concat(blockAlign)
+		.concat(bitsPerSample);
+	
+	
+	var subChunk1Id = new Int8Array([0x66, 0x6d, 0x74, 0x20]); // fmt 
+	var subChunk1Size = new Uint32Array([subChunk1.reduce(reducer, 0)]);
+	
+	var chunk1 = []
+		.concat(subChunk1Id)
+		.concat(subChunk1Size)
+		.concat(subChunk1);
+  
+  
+	// Chunk2 is the data itself
+	var subChunk2Id = new Int8Array([0x64, 0x61, 0x74, 0x61]); // data
+	var subChunk2Size = new Uint32Array([data.byteLength]); // length
+
+	var chunk2 = []
+		.concat(subChunk2Id)
+		.concat(subChunk2Size)
+		.concat(data);
+	
+	// Calculate total size for RIFF
+	var totalChunkSize = new Uint32Array([chunk1.reduce(reducer, 0) + chunk2.reduce(reducer, 0)]);
+  
+	return []
+	
+		// Header info for RIFF
+		.concat(riff)
+		.concat(totalChunkSize)
+		.concat(format)
+		.concat(chunk1)
+		.concat(chunk2);	
 }
 
 /**
